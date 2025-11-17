@@ -230,6 +230,7 @@ ii.	AI Scores (Numeric scoring breakdown)
 iii.	Computed Indicators (Any extra metrics you calculate manually or in n8n)
 
 •	This table stores the AI-generated English explanations, what n8n sends to Groq. Run;
+```
 CREATE TABLE lga_ai_insights (
     id SERIAL PRIMARY KEY,
     lga_id INT NOT NULL REFERENCES lga_master(lga_id),
@@ -239,17 +240,20 @@ CREATE TABLE lga_ai_insights (
     ai_risk_analysis TEXT,          -- Weaknesses, threats, risks
     created_at TIMESTAMP DEFAULT NOW()
 );
- 
+``` 
+<img width="859" height="266" alt="image" src="https://github.com/user-attachments/assets/86502761-59e1-439c-8fe7-7334d4fa4452" />
 
 
 
 This table will hold:
-	“This LGA shows strong telecom opportunity…”
-	“Population is high, income moderate…”
-	AI reasoning
-	AI advice
+- “This LGA shows strong telecom opportunity…”
+- “Population is high, income moderate…”
+- AI reasoning
+- AI advice
+  
 
 •	AI Scores Table (Numeric values). Run;
+```
 CREATE TABLE lga_ai_scores (
     id SERIAL PRIMARY KEY,
     lga_id INT NOT NULL REFERENCES lga_master(lga_id),
@@ -264,14 +268,17 @@ CREATE TABLE lga_ai_scores (
 
     created_at TIMESTAMP DEFAULT NOW()
 );
+```
 
 This table will hold all numeric metrics such as:
-	AI Viability Score
-	Growth Potential Score
-	Demand Score
-	Risk Score
+- AI Viability Score
+- Growth Potential Score
+- Demand Score
+- Risk Score
+
 
 •	Computed Insights Table (your custom formulas). Run
+```
 CREATE TABLE lga_computed_indicators (
     id SERIAL PRIMARY KEY,
     lga_id INT NOT NULL REFERENCES lga_master(lga_id),
@@ -286,11 +293,15 @@ CREATE TABLE lga_computed_indicators (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+```
 
 
 Step 4: Link all tables with a unique LGA ID for consistency across datasets.
+
 •	Insert All 60 LGAs into lga_master Table. Run the following one by one
+
 BENUE — NORTH CENTRAL
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Benue', 'Logo', 'North Central'),
 ('Benue', 'Ukum', 'North Central'),
@@ -302,8 +313,10 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Benue', 'Konshisha', 'North Central'),
 ('Benue', 'Obi', 'North Central'),
 ('Benue', 'Tarka', 'North Central');
+```
 
 TARABA — NORTH EAST
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Taraba', 'Donga', 'North East'),
 ('Taraba', 'Karim-Lamido', 'North East'),
@@ -315,8 +328,10 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Taraba', 'Kurmi', 'North East'),
 ('Taraba', 'Takum', 'North East'),
 ('Taraba', 'Ardo-Kola', 'North East');
+```
 
 KEBBI — NORTH WEST
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Kebbi', 'Bagudo', 'North West'),
 ('Kebbi', 'Koko/Besse', 'North West'),
@@ -328,7 +343,7 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Kebbi', 'Ngaski', 'North West'),
 ('Kebbi', 'Sakaba', 'North West'),
 ('Kebbi', 'Shanga', 'North West');
-
+```
 
 
 
@@ -336,6 +351,7 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 
 
 EBONYI — SOUTH EAST
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Ebonyi', 'Afikpo North', 'South East'),
 ('Ebonyi', 'Afikpo South', 'South East'),
@@ -347,8 +363,10 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Ebonyi', 'Ezza South', 'South East'),
 ('Ebonyi', 'Izzi', 'South East'),
 ('Ebonyi', 'Ohaukwu', 'South East');
+```
 
 AKWA IBOM — SOUTH SOUTH
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Akwa Ibom', 'Ini', 'South South'),
 ('Akwa Ibom', 'Oruk Anam', 'South South'),
@@ -360,8 +378,10 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Akwa Ibom', 'Ika', 'South South'),
 ('Akwa Ibom', 'Ibiono Ibom', 'South South'),
 ('Akwa Ibom', 'Okobo', 'South South');
+```
 
 EKITI — SOUTH WEST
+```
 INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Ekiti', 'Ise/Orun', 'South West'),
 ('Ekiti', 'Ikole', 'South West'),
@@ -373,77 +393,140 @@ INSERT INTO lga_master (state_name, lga_name, geo_zone) VALUES
 ('Ekiti', 'Irepodun/Ifelodun', 'South West'),
 ('Ekiti', 'Ilejemeje', 'South West'),
 ('Ekiti', 'Oye', 'South West');
+```
 
 
 
 
 
+### Phase 2: Data Collection, Automation, and AI Analysis (n8n + Groq API)
 
-Phase 2: Data Collection, Automation, and AI Analysis (n8n + Groq API)
 Automate the full process of data gathering, cleaning, and analysis using n8n.
+
 Step 1: Schedule workflows to pull new data automatically (daily or weekly).
+
 •	Open n8n
+
 •	Add a Cron Trigger Node
+
 •	Set the frequency depending on your preference:
+
+<img width="680" height="646" alt="image" src="https://github.com/user-attachments/assets/65128bf5-49e3-4c80-83fa-04265d61dba6" />
+
  
+
 Step 2: Connect n8n to all external data sources such to pull Economic and Income Estimate and Mobile and Internet Penetration
+
 Add Population HTTP node
+
 •	In n8n, create a new workflow (or open existing one).
+
 •	Add HTTP Request node.
+
 •	Rename it: WB_Population.
+
 •	Method: GET
+
 URL: https://api.worldbank.org/v2/country/NG/indicator/SP.POP.TOTL?format=json
+
 •	Response Format: JSON
+
 •	Click Execute Node.
+<img width="975" height="447" alt="image" src="https://github.com/user-attachments/assets/4cacdf68-5400-4eb1-b34e-54cf8b53c011" />
+
  
+
 
 Connect GDP per Capita API in n8n
+
 •	Add HTTP Request node.
+
 •	Rename it: WB_GDP_PerCapita
+
 •	Method: GET
+
 URL: https://api.worldbank.org/v2/country/NG/indicator/NY.GDP.PCAP.CD?format=json
+
 •	Response Format: JSON
+
 •	Click Execute Node.
- 
+ <img width="975" height="486" alt="image" src="https://github.com/user-attachments/assets/bee29fe6-d60c-448b-b040-8306058a8378" />
+
 
 
 
 Connect GNI per Capita API in n8n
+
 •	In n8n, create a new workflow 
+
 •	Add HTTP Request node.
+
 •	Rename it: WB_GNI_PerCapita
+
 •	Method: GET
+
 URL: https://api.worldbank.org/v2/country/NG/indicator/NY.GNP.PCAP.CD?format=json
+
 •	Response Format: JSON
+
 •	Click Execute Node.
- 
+ <img width="975" height="358" alt="image" src="https://github.com/user-attachments/assets/dc60ad80-4f06-441a-9cd3-2d9dc4148783" />
+
+
+
+
 Connect World Bank Mobile Penetration API
+
 •	In n8n, create a new workflow
+
 •	Add HTTP Request node.
+
 •	Rename it: WB_Mobile_Penetration
+
 •	Method: GET
+
 URL: https://api.worldbank.org/v2/country/NG/indicator/IT.CEL.SETS.P2?format=json
+
 •	Response Format: JSON
+
 •	Click Execute Node
+<img width="975" height="434" alt="image" src="https://github.com/user-attachments/assets/f5d3bb41-49d2-4fb1-8d99-64ed6a5855f9" />
+
+
  
+
 Connect World Bank Internet Penetration API
+
 •	In n8n, create a new workflow
+
 •	Add HTTP Request node.
+
 •	Rename it: WB_Internet_Penetration
+
 •	Method: GET
+
 URL: https://api.worldbank.org/v2/country/NG/indicator/IT.NET.USER.ZS?format=json
+
 •	Response Format: JSON
+
 •	Click Execute Node.
- 
+ <img width="975" height="605" alt="image" src="https://github.com/user-attachments/assets/9dbb7ebc-aa07-48dd-88d9-020dc2791e2e" />
+
 
 Step 3: Clean and merge all incoming data using Python or Set Nodes inside n8n.
 
 MERGE NATIONAL DATA
+
 •	Search for "Merge" node type
+
 •	Set Mode to: "Append and set it to 5
+
 •	Add a Code node
+
 •	Rename it: Merge_National_Data
+
 •	Paste this EXACT code 
+```
 const items = $input.all();
 
 function findIndicator(indicatorId) {
@@ -492,14 +575,21 @@ return [{
     }
   }
 }];
+```
 
 •	Click Execute
+<img width="975" height="492" alt="image" src="https://github.com/user-attachments/assets/00cd3350-73f6-45af-99e7-90d7de9bc51b" />
+
  
 
 Local Government Calculations
+
 •	Add a Code node
+
 •	Rename it: LGA_Distribution
+
 •	Paste this EXACT code 
+```
 // CORRECTED CODE - Using Naira GDP directly
 const nationalData = $input.first().json;
 
@@ -666,14 +756,23 @@ for (const [state, lgas] of Object.entries(lgaMaster)) {
 }
 
 return results;
+```
+
 
 Step 4: Save to PostgreSQL (Economic + Telecom tables) 
+
 Insert Economic Data (Using NGN Columns)
+
 Add PostgreSQL Node in n8n:
+
 •	Name: Save_Economic_Data
+
 •	Operation: Execute Query
+
 •	Mode: Execute for Each Item
+
 •	Query:
+```
 INSERT INTO lga_economic_income (
     lga_id,
     year,
@@ -704,16 +803,25 @@ DO UPDATE SET
     total_income_ngn = EXCLUDED.total_income_ngn,
     spending_power_ngn = EXCLUDED.spending_power_ngn,
     economic_score = EXCLUDED.economic_score;
+```
 
 •	Click Execute
- 
+ <img width="958" height="720" alt="image" src="https://github.com/user-attachments/assets/200d1436-679d-4a0e-bc1e-ba9d5c3644ad" />
+
+
 
 Insert Telecom Data
+
 Add PostgreSQL Node in n8n:
+
 •	Name: Save_Telecom_Data
+
 •	Operation: Execute Query
+
 •	Mode: Execute for Each Item
+
 •	Query:
+```
 INSERT INTO lga_mobile_internet (
     lga_id,
     year,
@@ -750,16 +858,25 @@ DO UPDATE SET
     internet_penetration_pct = EXCLUDED.internet_penetration_pct,
     estimated_internet_users = EXCLUDED.estimated_internet_users,
     telecom_demand_score = EXCLUDED.telecom_demand_score;
+```
 
 •	Click Execute
- 
+ <img width="975" height="526" alt="image" src="https://github.com/user-attachments/assets/6ea75a15-01f7-4c9f-981c-f25ec002f9b5" />
+
+
 
 Step 5: Send to AI for analysis
+
 From LGA_Distribution output:
+
 •	Click the + button on LGA_Distribution
+
 •	Add Code node
+
 •	Name: Format_For_AI
+
 •	Paste the code
+```
 const items = $input.all();  // Gets all 60 LGAs directly!
 const formatted = [];
 
@@ -826,12 +943,16 @@ Respond ONLY with valid JSON. No markdown, no explanation, just the JSON object.
 }
 
 return formatted;
+```
 
 •	Execute - you should see 60 items with prompts
- 
+ <img width="975" height="523" alt="image" src="https://github.com/user-attachments/assets/fcf692ad-cbb0-44d4-ae11-dc3b6e676371" />
+
+
 
 Add a Code node (name it AI_Analysis) and paste the below
 
+```
 const items = $input.all();
 const results = [];
 
@@ -925,14 +1046,23 @@ Provide telecom viability analysis. Respond with ONLY a JSON object (no markdown
 }
 
 return results;
+```
+
 Execute the node
- 
+ <img width="683" height="730" alt="image" src="https://github.com/user-attachments/assets/ee3b54b6-eadb-42eb-9f28-e38d7262c6f6" />
+
+
 
 Step 6: Save AI insights back to PostgreSQL (AI tables) 
+
 Add PostgreSQL Node:
+
 Name: Save_AI_Insights
+
 Operation: Insert
+
 Query:
+```
 o	id - Leave empty (auto-generated)
 o	state_name - ={{ $json.state_name }}
 o	lga_name - ={{ $json.lga_name }}
@@ -948,28 +1078,35 @@ o	ai_summary - ={{ $json.ai_summary }}
 o	ai_recommendation - ={{ $json.ai_recommendation }}
 o	ai_risk_analysis - ={{ $json.ai_risk_analysis }}
 o	created_at - Leave empty (auto-generated)
+```
 
 Click Execute step!
+<img width="975" height="750" alt="image" src="https://github.com/user-attachments/assets/2129d63a-10ef-4bca-8407-7b9d1459210b" />
 
  
 
 
-Phase 3: Visualization and Insights (Streamlit + Plotly)
+### Phase 3: Visualization and Insights (Streamlit + Plotly)
 Streamlit + Plotly will help decision-makers see where the real opportunities are — by ranking, mapping, and comparing LGAs based on AI-generated insights.
 
 
 
 
 •	Install dependencies, run;
+```
 pip install streamlit plotly psycopg2-binary pandas numpy --break-system-packages
- 
+``` 
+<img width="975" height="472" alt="image" src="https://github.com/user-attachments/assets/98af9e49-0d71-44a3-aa11-a13e45b8a0a2" />
 
 •	Create dashboard directory and file. Run;
+```
 mkdir -p ~/telco_dashboard 
 cd ~/telco_dashboard 
 touch app.py
+```
 
 •	Paste the below code on the created app.py file
+```
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
@@ -1722,16 +1859,21 @@ st.markdown("""
     <p>Data Source: World Bank API | Last Updated: {}</p>
 </div>
 """.format(datetime.now().strftime("%B %d, %Y - %H:%M")), unsafe_allow_html=True)
+```
 
 
 •	Run the below to start the dashboard;
+```
 streamlit run app.py --server.port 8502 --server.address 0.0.0.0
+```
 
 •	Paste the below on your browser to see the dashboard
+```
 http://your-server-ip:8502
- 
+``` 
+<img width="975" height="558" alt="image" src="https://github.com/user-attachments/assets/c8144ecb-416b-4363-af7d-95910531fa65" />
 
-Conclusion
+### Conclusion
 This project demonstrates the power of data automation and machine intelligence in transforming how telecom operators identify and pursue new growth areas across Nigeria. By integrating multiple real-world datasets including population, economic estimates, network penetration, and digital adoption patterns and processing them through an automated n8n + PostgreSQL pipeline enhanced by AI-driven scoring, the system delivers precise, location-specific market intelligence that was previously inaccessible.
 With a focus on rural and semi-urban LGAs, the Telco Go-To-Market: LGA Potential Analyzer & Forecasting System moves decision-making away from intuition and fragmented reporting into a framework that is data-driven, structured, and continuously updated. The result is a real-time dashboard that gives telecom leaders deep visibility into where investment will deliver the highest commercial impact for network rollout, agent deployment, kiosk placement, and digital service expansion.
 Ultimately, this solution supports a more inclusive telecommunications future where millions of underserved Nigerians gain access to stronger connectivity and digital opportunities. It empowers telcos to expand intelligently, policymakers to plan sustainably, and local communities to benefit from improved digital access reinforcing that the strategic use of AI and automation is not just a business advantage but a catalyst for national development.
